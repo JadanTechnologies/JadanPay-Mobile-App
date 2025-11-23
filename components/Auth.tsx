@@ -2,16 +2,15 @@
 import React, { useState, useEffect } from 'react';
 import { login, register } from '../services/authService';
 import { User } from '../types';
-import { Loader2, ArrowLeft } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { playNotification } from '../utils/audio';
 import { SettingsService } from '../services/settingsService';
 
 interface AuthProps {
   onAuthSuccess: (user: User) => void;
-  onBack: () => void;
 }
 
-export const Auth: React.FC<AuthProps> = ({ onAuthSuccess, onBack }) => {
+export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -71,13 +70,7 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess, onBack }) => {
 
       {/* Main Card with Levitation Animation */}
       <div className="bg-white dark:bg-gray-900 w-full max-w-md rounded-2xl p-8 shadow-2xl border border-gray-100 dark:border-gray-800 relative z-10 levitate transition-all duration-300">
-        <button 
-            onClick={onBack}
-            className="absolute top-6 left-6 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
-        >
-            <ArrowLeft size={20} />
-        </button>
-
+        
         <div className="text-center mb-8 mt-2">
             <div className="mx-auto mb-4 w-20 h-20 flex items-center justify-center">
                 {logoUrl ? (

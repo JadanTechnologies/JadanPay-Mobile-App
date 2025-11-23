@@ -15,10 +15,12 @@ interface LayoutProps {
 export const Layout: React.FC<LayoutProps> = ({ children, user, activeTab, onTabChange, onLogout }) => {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [appName, setAppName] = useState('JadanPay');
+  const [logoUrl, setLogoUrl] = useState('');
 
   useEffect(() => {
       SettingsService.getSettings().then(s => {
           setAppName(s.appName);
+          if (s.logoUrl) setLogoUrl(s.logoUrl);
       });
   }, []);
 
@@ -51,10 +53,16 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, activeTab, onTab
       
       {/* Mobile Header (App Bar) */}
       <header className="flex-none bg-white dark:bg-black px-4 pt-12 pb-3 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center sticky top-0 z-20 shadow-sm/50 backdrop-blur-md bg-opacity-90">
-            <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center text-white font-black text-lg shadow-lg shadow-green-600/20">
-                    {appName.charAt(0)}
-                </div>
+            <div className="flex items-center gap-3">
+                {logoUrl ? (
+                     <div className="w-8 h-8 rounded-lg overflow-hidden shadow-sm">
+                         <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
+                     </div>
+                ) : (
+                    <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center text-white font-black text-lg shadow-lg shadow-green-600/20">
+                        {appName.charAt(0)}
+                    </div>
+                )}
                 <div>
                     <h1 className="text-lg font-bold text-gray-900 dark:text-white leading-none">{appName}</h1>
                     <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">Hello, {user.name.split(' ')[0]}</p>
@@ -66,11 +74,11 @@ export const Layout: React.FC<LayoutProps> = ({ children, user, activeTab, onTab
                     <Bell size={20} />
                     <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border border-white dark:border-black"></span>
                  </button>
-                 <div className="relative" onClick={() => onTabChange('profile')}>
+                 <div className="relative cursor-pointer" onClick={() => onTabChange('profile')}>
                     <img 
                         src={`https://ui-avatars.com/api/?name=${user.name}&background=16a34a&color=fff`} 
                         alt="Profile" 
-                        className="w-9 h-9 rounded-full border-2 border-white dark:border-gray-800 shadow-sm"
+                        className="w-9 h-9 rounded-full border-2 border-white dark:border-gray-800 shadow-sm hover:scale-105 transition-transform"
                     />
                  </div>
             </div>

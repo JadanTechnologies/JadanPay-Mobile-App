@@ -13,7 +13,6 @@ import { AdminStaff } from './components/AdminStaff';
 import { AdminCommunication } from './components/AdminCommunication';
 import { AdminPayments } from './components/AdminPayments';
 import { ResellerZone } from './components/ResellerZone';
-import { LandingPage } from './components/LandingPage';
 import { UserProfile } from './components/UserProfile';
 import { SplashScreen } from './components/SplashScreen';
 import { User, UserRole } from './types';
@@ -24,7 +23,6 @@ export default function App() {
   const [user, setUser] = useState<User | null>(null);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [selectedTxId, setSelectedTxId] = useState<string | undefined>(undefined);
-  const [showLanding, setShowLanding] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
@@ -51,7 +49,6 @@ export default function App() {
               const found = users.find(u => u.id === savedUserId);
               if (found) {
                   setUser(found);
-                  setShowLanding(false);
               }
           });
       }
@@ -77,7 +74,6 @@ export default function App() {
       } else {
           setActiveTab('dashboard');
       }
-      setShowLanding(false);
   };
 
   if (showSplash) {
@@ -89,19 +85,9 @@ export default function App() {
   return (
     <div className="w-full h-full md:max-w-md md:mx-auto bg-white dark:bg-black md:shadow-2xl md:border-x border-gray-200 dark:border-gray-800 relative overflow-hidden">
         {!user ? (
-            showLanding ? (
-                <LandingPage 
-                    onGetStarted={() => setShowLanding(false)} 
-                    onLogin={() => setShowLanding(false)}
-                    toggleTheme={() => setIsDarkMode(!isDarkMode)}
-                    isDarkMode={isDarkMode}
-                />
-            ) : (
-                <Auth 
-                    onAuthSuccess={handleAuthSuccess} 
-                    onBack={() => setShowLanding(true)}
-                />
-            )
+            <Auth 
+                onAuthSuccess={handleAuthSuccess} 
+            />
         ) : (
             <Layout 
                 user={user} 
@@ -111,7 +97,6 @@ export default function App() {
                     setUser(null);
                     localStorage.removeItem('JADANPAY_CURRENT_USER_ID');
                     setActiveTab('dashboard'); 
-                    setShowLanding(true); 
                 }}
             >
                {activeTab === 'dashboard' && (user.role === UserRole.ADMIN ? <AdminDashboard /> : <Dashboard user={user} refreshUser={handleRefreshUser} onViewReceipt={handleViewReceipt} />)}

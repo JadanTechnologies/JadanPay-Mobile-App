@@ -227,26 +227,6 @@ export const AdminSettings: React.FC = () => {
                               </div>
                           </div>
                       </div>
-
-                      <h3 className="font-bold text-gray-800 mb-4 border-b pb-2 pt-4">Landing Page</h3>
-                      <div className="space-y-4">
-                          <div>
-                              <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Hero Title</label>
-                              <input 
-                                  value={settings.landingHeroTitle}
-                                  onChange={e => setSettings({...settings, landingHeroTitle: e.target.value})}
-                                  className="w-full p-3 border rounded-xl"
-                              />
-                          </div>
-                          <div>
-                              <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Hero Subtitle</label>
-                              <textarea 
-                                  value={settings.landingHeroSubtitle}
-                                  onChange={e => setSettings({...settings, landingHeroSubtitle: e.target.value})}
-                                  className="w-full p-3 border rounded-xl h-20"
-                              />
-                          </div>
-                      </div>
                       
                       <button onClick={handleSave} disabled={isSaving} className="px-6 py-3 bg-green-700 text-white rounded-xl font-bold hover:bg-green-800">
                           {isSaving ? 'Saving...' : 'Save General Settings'}
@@ -915,7 +895,7 @@ export const AdminSettings: React.FC = () => {
               <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 text-blue-800">
                   <h4 className="font-bold flex items-center gap-2 mb-2"><Server size={18}/> Status</h4>
                   <p className="text-sm">System is running optimally.</p>
-                  <p className="text-xs mt-2 opacity-70">Version: 2.1.0 (Multi-Gateway)</p>
+                  <p className="text-xs mt-2 opacity-70">Version: 2.1.0 (Mobile App)</p>
               </div>
           </div>
       </div>

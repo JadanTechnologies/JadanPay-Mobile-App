@@ -1,6 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Wifi, Smartphone, Zap, Tv, Globe } from 'lucide-react';
+import { SettingsService } from '../services/settingsService';
 
 interface SplashScreenProps {
   onFinish: () => void;
@@ -8,19 +9,27 @@ interface SplashScreenProps {
 
 export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
   const [progress, setProgress] = useState(0);
+  const [logoUrl, setLogoUrl] = useState('');
+  const [appName, setAppName] = useState('JadanPay');
 
   useEffect(() => {
+    // Load Branding
+    SettingsService.getSettings().then(s => {
+        if (s.logoUrl) setLogoUrl(s.logoUrl);
+        if (s.appName) setAppName(s.appName);
+    });
+
     // Progress Bar Animation
     const interval = setInterval(() => {
       setProgress(prev => {
         if (prev >= 100) {
           clearInterval(interval);
-          setTimeout(onFinish, 500); // Small delay after 100%
+          setTimeout(onFinish, 800); // Slightly longer delay to admire the logo
           return 100;
         }
         return prev + 2; // Increment speed
       });
-    }, 40);
+    }, 35);
 
     return () => clearInterval(interval);
   }, [onFinish]);
@@ -38,9 +47,15 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
       <div className="perspective-container w-64 h-64 relative mb-12">
         <div className="w-full h-full relative preserve-3d animate-float">
             
-            {/* Core Glowing Sphere */}
-            <div className="absolute inset-0 m-auto w-24 h-24 bg-gradient-to-br from-green-400 to-green-600 rounded-full blur-md shadow-[0_0_50px_rgba(34,197,94,0.6)] animate-pulse z-10 flex items-center justify-center text-black font-black text-4xl">
-               J
+            {/* Core Glowing Sphere / Logo Container */}
+            <div className="absolute inset-0 m-auto w-28 h-28 bg-white/10 rounded-full blur-sm shadow-[0_0_50px_rgba(34,197,94,0.6)] animate-pulse z-10 flex items-center justify-center overflow-hidden border-2 border-green-500/50 backdrop-blur-sm">
+               {logoUrl ? (
+                   <img src={logoUrl} alt="Logo" className="w-full h-full object-cover p-1 rounded-full" />
+               ) : (
+                   <div className="text-white font-black text-5xl bg-gradient-to-br from-green-400 to-green-600 bg-clip-text text-transparent">
+                       {appName.charAt(0)}
+                   </div>
+               )}
             </div>
             
             {/* Orbiting Ring 1 */}
@@ -79,20 +94,19 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
 
       {/* App Name & Loading */}
       <div className="relative z-10 text-center space-y-6">
-         <h1 className="text-4xl font-black text-white tracking-tighter mb-2">
-            Jadan<span className="text-green-500">Pay</span>
+         <h1 className="text-4xl font-black text-white tracking-tighter mb-2 drop-shadow-lg">
+            {appName}
          </h1>
-         <p className="text-gray-400 text-sm font-medium tracking-widest uppercase">Initializing Secure Gateway...</p>
+         <p className="text-gray-400 text-xs font-medium tracking-[0.2em] uppercase">Secure Mobile Payments</p>
          
          {/* Progress Bar */}
-         <div className="w-64 h-1.5 bg-gray-800 rounded-full overflow-hidden mx-auto relative">
+         <div className="w-64 h-1 bg-gray-900 rounded-full overflow-hidden mx-auto relative">
             <div 
-                className="h-full bg-gradient-to-r from-green-500 to-emerald-400 rounded-full transition-all duration-100 ease-out"
+                className="h-full bg-gradient-to-r from-green-500 to-emerald-400 rounded-full transition-all duration-100 ease-out shadow-[0_0_10px_#22c55e]"
                 style={{ width: `${progress}%` }}
             ></div>
-            <div className="absolute top-0 right-0 h-full w-full bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" style={{ transform: 'skewX(-20deg)' }}></div>
          </div>
-         <p className="text-green-500/80 font-mono text-xs">{progress}%</p>
+         <p className="text-green-500/80 font-mono text-[10px]">{progress}%</p>
       </div>
 
     </div>
