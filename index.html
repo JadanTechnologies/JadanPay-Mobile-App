@@ -2,8 +2,11 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>JadanPay VTU</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#15803d" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>JadanPay Mobile</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -15,6 +18,8 @@
               'float-delayed': 'float 6s ease-in-out 3s infinite',
               'fade-in': 'fadeIn 0.5s ease-out forwards',
               'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
+              'spin-slow': 'spin 8s linear infinite',
+              'spin-reverse': 'spinReverse 10s linear infinite',
             },
             keyframes: {
               float: {
@@ -28,6 +33,10 @@
               fadeInUp: {
                 '0%': { opacity: '0', transform: 'translateY(20px)' },
                 '100%': { opacity: '1', transform: 'translateY(0)' },
+              },
+              spinReverse: {
+                '0%': { transform: 'rotate(0deg)' },
+                '100%': { transform: 'rotate(-360deg)' },
               }
             }
           }
@@ -35,16 +44,22 @@
       }
     </script>
     <style>
+      /* Mobile App Resets */
+      html, body {
+        height: 100%;
+        width: 100%;
+        overflow: hidden; /* Prevent bounce scrolling on body */
+        overscroll-behavior: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+
       /* Custom Scrollbar for a premium feel */
       ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
+        width: 4px;
+        height: 4px;
       }
       ::-webkit-scrollbar-track {
-        background: #f1f1f1;
-      }
-      .dark ::-webkit-scrollbar-track {
-        background: #1f2937;
+        background: transparent;
       }
       ::-webkit-scrollbar-thumb {
         background: #d1d5db;
@@ -53,9 +68,24 @@
       .dark ::-webkit-scrollbar-thumb {
         background: #4b5563;
       }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #9ca3af;
+
+      /* 3D Animation Styles */
+      .perspective-container {
+        perspective: 1000px;
       }
+      
+      .preserve-3d {
+        transform-style: preserve-3d;
+      }
+      
+      .orbit-item {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform-style: preserve-3d;
+      }
+
+      /* Receipt Pattern */
       .receipt-pattern {
         background-color: #ffffff;
         background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
@@ -64,11 +94,6 @@
       .dark .receipt-pattern {
         background-color: #1f2937;
         background-image: radial-gradient(#374151 1px, transparent 1px);
-      }
-      
-      /* Levitation Animation Class */
-      .levitate {
-        animation: float 6s ease-in-out infinite;
       }
     </style>
   <script type="importmap">
@@ -83,7 +108,7 @@
 }
 </script>
 </head>
-  <body class="bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 antialiased font-sans transition-colors duration-300">
-    <div id="root"></div>
+  <body class="bg-black text-gray-900 dark:text-gray-100 antialiased font-sans transition-colors duration-300">
+    <div id="root" class="h-full w-full flex justify-center bg-gray-900"></div>
   </body>
 </html>

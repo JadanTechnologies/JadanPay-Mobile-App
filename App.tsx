@@ -15,27 +15,25 @@ import { AdminPayments } from './components/AdminPayments';
 import { ResellerZone } from './components/ResellerZone';
 import { LandingPage } from './components/LandingPage';
 import { UserProfile } from './components/UserProfile';
+import { SplashScreen } from './components/SplashScreen';
 import { User, UserRole } from './types';
 import { MockDB } from './services/mockDb';
 
 export default function App() {
+  const [showSplash, setShowSplash] = useState(true);
   const [user, setUser] = useState<User | null>(null);
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [isLoadingUser, setIsLoadingUser] = useState(false);
   const [selectedTxId, setSelectedTxId] = useState<string | undefined>(undefined);
   const [showLanding, setShowLanding] = useState(true);
-  
-  // Theme Management
   const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Initialize theme from system preference
   useEffect(() => {
+    // Theme initialization
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
        setIsDarkMode(true);
     }
   }, []);
 
-  // Update HTML class for Tailwind Dark Mode
   useEffect(() => {
     const root = window.document.documentElement;
     if (isDarkMode) {
@@ -45,11 +43,8 @@ export default function App() {
     }
   }, [isDarkMode]);
 
-  // Try to load user if we have a "session" (simplified logic for this mock)
+  // Session Check
   useEffect(() => {
-      // In a real app, we check for a token. Here we rely on Auth component to set state.
-      // But if we want persistence across reload without re-login for the user:
-      // We could store the loggedInUserId in localStorage.
       const savedUserId = localStorage.getItem('JADANPAY_CURRENT_USER_ID');
       if (savedUserId && !user) {
           MockDB.getUsers().then(users => {
@@ -62,18 +57,11 @@ export default function App() {
       }
   }, []);
 
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-  };
-
   const handleRefreshUser = async () => {
     if(!user) return;
-    setIsLoadingUser(true);
-    // Fetch latest user state (balance updates etc)
     const updatedUserList = await MockDB.getUsers();
     const currentUser = updatedUserList.find(u => u.id === user.id);
     if(currentUser) setUser(currentUser);
-    setIsLoadingUser(false);
   };
 
   const handleViewReceipt = (txId: string) => {
@@ -81,15 +69,9 @@ export default function App() {
     setActiveTab('history');
   };
 
-  const handleTabChange = (tab: string) => {
-    setActiveTab(tab);
-    setSelectedTxId(undefined);
-  };
-  
   const handleAuthSuccess = (u: User) => {
       setUser(u);
-      localStorage.setItem('JADANPAY_CURRENT_USER_ID', u.id); // Persist session
-      // Redirect Admin strictly to admin dashboard, others to user dashboard
+      localStorage.setItem('JADANPAY_CURRENT_USER_ID', u.id);
       if (u.role === UserRole.ADMIN) {
           setActiveTab('admin');
       } else {
@@ -98,76 +80,55 @@ export default function App() {
       setShowLanding(false);
   };
 
-  if (!user) {
-    if (showLanding) {
-        return <LandingPage 
-            onGetStarted={() => setShowLanding(false)} 
-            onLogin={() => setShowLanding(false)}
-            toggleTheme={toggleTheme}
-            isDarkMode={isDarkMode}
-        />;
-    }
-    
-    return <Auth 
-        onAuthSuccess={handleAuthSuccess} 
-        onBack={() => setShowLanding(true)}
-    />;
+  if (showSplash) {
+      return <SplashScreen onFinish={() => setShowSplash(false)} />;
   }
 
-  const renderContent = () => {
-    // Permission Guard
-    if (activeTab.startsWith('admin') && user.role !== UserRole.ADMIN) {
-        return <div className="p-10 text-center dark:text-white">Unauthorized Access</div>;
-    }
-
-    switch (activeTab) {
-      case 'dashboard':
-        return user.role === UserRole.ADMIN ? <AdminDashboard /> : <Dashboard user={user} refreshUser={handleRefreshUser} onViewReceipt={handleViewReceipt} />;
-      case 'history':
-        return <History user={user} highlightId={selectedTxId} />;
-      case 'profile':
-        return <UserProfile user={user} onUpdate={handleRefreshUser} />;
-      case 'support':
-        return <Support user={user} />;
-      
-      // Admin Routes
-      case 'admin':
-         return <AdminDashboard />;
-      case 'admin-users':
-         return <AdminUsers />;
-      case 'admin-payments':
-         return <AdminPayments />;
-      case 'admin-support':
-         return <AdminSupport />;
-      case 'admin-communication':
-         return <AdminCommunication />;
-      case 'admin-staff':
-         return <AdminStaff />;
-      case 'admin-settings':
-         return <AdminSettings />;
-      
-      case 'reseller':
-         return user.role === UserRole.RESELLER ? <ResellerZone /> : <div className="p-10 text-center dark:text-white">Unauthorized</div>;
-      default:
-        // Fallback based on role
-        if (user.role === UserRole.ADMIN) return <AdminDashboard />;
-        return <Dashboard user={user} refreshUser={handleRefreshUser} onViewReceipt={handleViewReceipt} />;
-    }
-  };
-
+  // --- Mobile App Wrapper ---
+  // Limits width on desktop to simulate phone, full width on mobile
   return (
-    <Layout 
-        user={user} 
-        activeTab={activeTab} 
-        onTabChange={handleTabChange}
-        onLogout={() => {
-            setUser(null);
-            localStorage.removeItem('JADANPAY_CURRENT_USER_ID');
-            setActiveTab('dashboard'); 
-            setShowLanding(true); 
-        }}
-    >
-      {renderContent()}
-    </Layout>
+    <div className="w-full h-full md:max-w-md md:mx-auto bg-white dark:bg-black md:shadow-2xl md:border-x border-gray-200 dark:border-gray-800 relative overflow-hidden">
+        {!user ? (
+            showLanding ? (
+                <LandingPage 
+                    onGetStarted={() => setShowLanding(false)} 
+                    onLogin={() => setShowLanding(false)}
+                    toggleTheme={() => setIsDarkMode(!isDarkMode)}
+                    isDarkMode={isDarkMode}
+                />
+            ) : (
+                <Auth 
+                    onAuthSuccess={handleAuthSuccess} 
+                    onBack={() => setShowLanding(true)}
+                />
+            )
+        ) : (
+            <Layout 
+                user={user} 
+                activeTab={activeTab} 
+                onTabChange={(tab) => { setActiveTab(tab); setSelectedTxId(undefined); }}
+                onLogout={() => {
+                    setUser(null);
+                    localStorage.removeItem('JADANPAY_CURRENT_USER_ID');
+                    setActiveTab('dashboard'); 
+                    setShowLanding(true); 
+                }}
+            >
+               {activeTab === 'dashboard' && (user.role === UserRole.ADMIN ? <AdminDashboard /> : <Dashboard user={user} refreshUser={handleRefreshUser} onViewReceipt={handleViewReceipt} />)}
+               {activeTab === 'history' && <History user={user} highlightId={selectedTxId} />}
+               {activeTab === 'profile' && <UserProfile user={user} onUpdate={handleRefreshUser} />}
+               {activeTab === 'support' && <Support user={user} />}
+               
+               {/* Admin Routes */}
+               {activeTab === 'admin' && <AdminDashboard />}
+               {activeTab === 'admin-users' && <AdminUsers />}
+               {activeTab === 'admin-payments' && <AdminPayments />}
+               {activeTab === 'admin-settings' && <AdminSettings />}
+               
+               {/* Fallbacks */}
+               {activeTab === 'reseller' && <ResellerZone />}
+            </Layout>
+        )}
+    </div>
   );
 }
